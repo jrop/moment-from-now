@@ -1,6 +1,6 @@
 {
   "name": "moment-from-now",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "index.js",
   "license": "MIT",
   "scripts": {
@@ -12,5 +12,9 @@
     "babel-preset-latest": "^6.16.0",
     "mocha": "^3.1.2",
     "uglify-js": "^2.7.4"
+  },
+  "repository": "https://github.com/jrop/moment-from-now",
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org/"
   }
 }
