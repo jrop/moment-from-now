@@ -1,0 +1,16 @@
+{
+  "name": "moment-from-now",
+  "version": "0.0.1",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "build": "babel index.js | uglifyjs --compress --mangle > index.min.js",
+    "test": "mocha test.js"
+  },
+  "devDependencies": {
+    "babel-cli": "^6.18.0",
+    "babel-preset-latest": "^6.16.0",
+    "mocha": "^3.1.2",
+    "uglify-js": "^2.7.4"
+  }
+}

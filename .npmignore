@@ -1,0 +1,4 @@
+.babelrc
+*.min.js
+test.js
+yarn.lock
