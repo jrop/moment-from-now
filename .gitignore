@@ -1,4 +1,5 @@
 node_modules/
 *.d.ts
 *.min.js
+*.tgz
 index.js
