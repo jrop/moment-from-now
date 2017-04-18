@@ -4,17 +4,24 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build": "babel index.js | uglifyjs --compress --mangle > index.min.js",
+    "clean": "rm index.js index.min.js index.d.ts",
+    "build": "tsc && uglifyjs index.js --compress --mangle > index.min.js",
+    "prepublish": "npm run build && npm run test",
     "test": "mocha test.js"
   },
   "devDependencies": {
     "babel-cli": "^6.18.0",
     "babel-preset-latest": "^6.16.0",
     "mocha": "^3.1.2",
+    "typescript": "^2.2.2",
     "uglify-js": "^2.7.4"
   },
   "repository": "https://github.com/jrop/moment-from-now",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
-  }
+  },
+  "files": [
+    "index.d.ts",
+    "index.js"
+  ]
 }

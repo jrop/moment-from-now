@@ -1,2 +1,4 @@
 node_modules/
+*.d.ts
 *.min.js
+index.js

@@ -1,5 +1,3 @@
-'use strict'
-
 // 146097 days in 400 years (moment.js:daysToMonths()):
 const DAYS_PER_MONTH = 146097 / 400 / 12
 
@@ -39,5 +37,5 @@ function fromNow(date) {
 		date = new Date(date)
 	return humanize(date.getTime() - now)
 }
-fromNow.humanize = humanize
-module.exports = fromNow
+;(fromNow as any).humanize = humanize
+export = fromNow
