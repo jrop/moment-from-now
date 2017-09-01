@@ -1,6 +1,8 @@
 moment-from-now
 ===============
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/jrop/moment-from-now.svg)](https://greenkeeper.io/)
+
 An extremely small (<1kb minified) `.fromNow()` implementation.
 
 ## Installation
