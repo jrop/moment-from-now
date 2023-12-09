@@ -1,41 +1,54 @@
 // 146097 days in 400 years (moment.js:daysToMonths()):
-const DAYS_PER_MONTH = 146097 / 400 / 12
+const DAYS_PER_MONTH = 146097 / 400 / 12;
 
-function first(arr, func) {
-	for (let i = 0; i < arr.length; ++i)
-		if (func(arr[i])) return arr[i]
+/**
+ * Returns val, rounded if it is less than the threshold, otherwise
+ * it returns a tombstone value (0).
+ */
+const thresh = (threshold: number, val: number) => {
+  const valRounded = Math.round(val);
+  return valRounded < threshold ? valRounded : 0;
+};
+const pluralize = (n: number, word: string) => (n === 1 ? word : `${word}s`);
+const makeHumanizedString = (n: number, singularUnit: string, ago: boolean) =>
+  `${n} ${pluralize(n, singularUnit)}${ago ? " ago" : ""}`;
+
+const SECONDS_MS = 1000;
+const MINUTES_MS = 60 * SECONDS_MS;
+const HOURS_MS = 60 * MINUTES_MS;
+const DAYS_MS = 24 * HOURS_MS;
+const MONTHS_MS = DAYS_PER_MONTH * DAYS_MS;
+const YEARS_MS = 365 * DAYS_MS;
+
+function humanize(durationMs: number) {
+  const ago = durationMs < 0;
+  const absDurationMs = Math.abs(durationMs);
+
+  let n = thresh(45, absDurationMs / SECONDS_MS);
+  if (n !== 0) return makeHumanizedString(n, "second", ago);
+
+  n = thresh(45, absDurationMs / MINUTES_MS);
+  if (n !== 0) return makeHumanizedString(n, "minute", ago);
+
+  n = thresh(22, absDurationMs / HOURS_MS);
+  if (n !== 0) return makeHumanizedString(n, "hour", ago);
+
+  n = thresh(26, absDurationMs / DAYS_MS);
+  if (n !== 0) return makeHumanizedString(n, "day", ago);
+
+  n = thresh(11, absDurationMs / MONTHS_MS);
+  if (n !== 0) return makeHumanizedString(n, "month", ago);
+
+  n = thresh(Number.MAX_VALUE, absDurationMs / YEARS_MS);
+  if (n !== 0) return makeHumanizedString(n, "year", ago);
+
+  return "now";
 }
 
-function thresh(t, val) {
-	val = Math.round(val)
-	return val < t ? val : 0
+function fromNow(date: Date | number) {
+  const now = new Date().getTime();
+  const normalizedDate = date instanceof Date ? date.getTime() : date;
+  return humanize(normalizedDate - now);
 }
 
-function humanize(duration) {
-	let ago = duration < 0
-	duration = Math.abs(duration)
-	duration = [
-		{ n: thresh(45, duration / 1000), units: 'seconds' },
-		{ n: thresh(45, duration / (60 * 1000)), units: 'minutes' },
-		{ n: thresh(22, duration / (60 * 60 * 1000)), units: 'hours' },
-		{ n: thresh(26, duration / (24 * 60 * 60 * 1000)), units: 'days' },
-		{ n: thresh(11, duration / (DAYS_PER_MONTH * 24 * 60 * 60 * 1000)), units: 'months' },
-		{ n: thresh(Number.MAX_VALUE, duration / (365 * 24 * 60 * 60 * 1000)), units: 'years' },
-		{ n: 'now', units: '' },
-	]
-	duration = first(duration, part => part.n !== 0)
-	ago = ago && duration.n != 'now'
-	if (duration.n == 1)
-		duration.units = duration.units.replace(/s$/, '')
-	duration = duration ? `${duration.n} ${duration.units}${ago ? ' ago' : ''}` : 'just now'
-	return duration.trim()
-}
-
-function fromNow(date) {
-	const now = new Date().getTime()
-	if (!(date instanceof Date))
-		date = new Date(date)
-	return humanize(date.getTime() - now)
-}
-;(fromNow as any).humanize = humanize
-export = fromNow
+export default Object.assign(fromNow, { humanize });

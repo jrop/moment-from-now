@@ -1,20 +1,20 @@
 {
   "name": "moment-from-now",
-  "version": "0.0.4",
+  "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "clean": "rm index.js index.min.js index.d.ts",
-    "build": "tsc && uglifyjs index.js --compress --mangle > index.min.js",
-    "prepublish": "npm run build && npm run test",
-    "test": "mocha test.js"
+    "ci": "bun tsc && bun run test && bun biome ci .",
+    "lint": "biome check .",
+    "lint:fix": "biome check --apply-unsafe .",
+    "prepack": "bun ci",
+    "test": "bun test *.test.ts"
   },
   "devDependencies": {
-    "babel-cli": "^6.18.0",
-    "babel-preset-latest": "^6.16.0",
-    "mocha": "^3.1.2",
-    "typescript": "^2.2.2",
-    "uglify-js": "^2.7.4"
+    "@biomejs/biome": "^1.4.1",
+    "bun-types": "latest",
+    "typescript": "^5.0.0"
   },
   "repository": "https://github.com/jrop/moment-from-now",
   "publishConfig": {
@@ -22,6 +22,7 @@
   },
   "files": [
     "index.d.ts",
-    "index.js"
+    "index.js",
+    "!*.test.js"
   ]
 }
