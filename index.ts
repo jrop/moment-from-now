@@ -9,9 +9,8 @@ const thresh = (threshold: number, val: number) => {
   const valRounded = Math.round(val);
   return valRounded < threshold ? valRounded : 0;
 };
-const pluralize = (n: number, word: string) => (n === 1 ? word : `${word}s`);
-const makeHumanizedString = (n: number, singularUnit: string, ago: boolean) =>
-  `${n} ${pluralize(n, singularUnit)}${ago ? " ago" : ""}`;
+const pluralize = (n: number, unit: Unit) =>
+  n === 1 || unit === "ms" ? unit : `${unit}s`;
 
 const SECONDS_MS = 1000;
 const MINUTES_MS = 60 * SECONDS_MS;
@@ -20,29 +19,55 @@ const DAYS_MS = 24 * HOURS_MS;
 const MONTHS_MS = DAYS_PER_MONTH * DAYS_MS;
 const YEARS_MS = 365 * DAYS_MS;
 
+type Unit = "ms" | "second" | "minute" | "hour" | "day" | "month" | "year";
+class Info {
+  constructor(
+    public count: number,
+    public unit: Unit,
+    public ago: boolean,
+    public ms: number,
+  ) {}
+
+  toString() {
+    return `${this.count} ${pluralize(this.count, this.unit)}${
+      this.ago ? " ago" : ""
+    }`;
+  }
+
+  static fromMs(durationMs: number) {
+    const ago = durationMs < 0;
+    const absDurationMs = Math.abs(durationMs);
+
+    let count = thresh(45, absDurationMs / SECONDS_MS);
+    if (count !== 0) return new Info(count, "second", ago, absDurationMs);
+
+    count = thresh(45, absDurationMs / MINUTES_MS);
+    if (count !== 0) return new Info(count, "minute", ago, absDurationMs);
+
+    count = thresh(22, absDurationMs / HOURS_MS);
+    if (count !== 0) return new Info(count, "hour", ago, absDurationMs);
+
+    count = thresh(26, absDurationMs / DAYS_MS);
+    if (count !== 0) return new Info(count, "day", ago, absDurationMs);
+
+    count = thresh(11, absDurationMs / MONTHS_MS);
+    if (count !== 0) return new Info(count, "month", ago, absDurationMs);
+
+    count = thresh(Number.MAX_VALUE, absDurationMs / YEARS_MS);
+    if (count !== 0) return new Info(count, "year", ago, absDurationMs);
+
+    return new Info(absDurationMs, "ms", ago, absDurationMs);
+  }
+}
+
+function info(durationMs: number) {
+  return Info.fromMs(durationMs);
+}
+
 function humanize(durationMs: number) {
-  const ago = durationMs < 0;
-  const absDurationMs = Math.abs(durationMs);
-
-  let n = thresh(45, absDurationMs / SECONDS_MS);
-  if (n !== 0) return makeHumanizedString(n, "second", ago);
-
-  n = thresh(45, absDurationMs / MINUTES_MS);
-  if (n !== 0) return makeHumanizedString(n, "minute", ago);
-
-  n = thresh(22, absDurationMs / HOURS_MS);
-  if (n !== 0) return makeHumanizedString(n, "hour", ago);
-
-  n = thresh(26, absDurationMs / DAYS_MS);
-  if (n !== 0) return makeHumanizedString(n, "day", ago);
-
-  n = thresh(11, absDurationMs / MONTHS_MS);
-  if (n !== 0) return makeHumanizedString(n, "month", ago);
-
-  n = thresh(Number.MAX_VALUE, absDurationMs / YEARS_MS);
-  if (n !== 0) return makeHumanizedString(n, "year", ago);
-
-  return "now";
+  const inf = info(durationMs);
+  if (inf.unit === "ms") return "now";
+  return inf.toString();
 }
 
 function fromNow(date: Date | number) {
@@ -51,4 +76,4 @@ function fromNow(date: Date | number) {
   return humanize(normalizedDate - now);
 }
 
-export default Object.assign(fromNow, { humanize });
+export default Object.assign(fromNow, { humanize, info });
